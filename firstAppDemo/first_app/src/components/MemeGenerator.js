@@ -28,9 +28,9 @@ class MemeGenerator extends Component{
         this.setState({[name]: value})
     }
     handleSubmit(event){
+        event.preventDefault()
         const rand = Math.round(Math.random() * this.state.allMemeImgs.length)
         this.setState({randImg: this.state.allMemeImgs[rand].url})
-        event.preventDefault()
     }
     render(){
         return (
