@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Formik, Field, Form, FieldArray, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
-import { EditorState } from 'draft-js'
+import axios from 'axios'
 
 const initialValues = {
     friends: [
@@ -12,8 +12,11 @@ const initialValues = {
     ]
 }
 
-const invitation = () => (
-    <div>
+const invitation = props => {
+    const [image, setImage] = useState([])
+
+    return (
+        <div>
         <h1>Invite Friends</h1>
         <Formik
             initialValues={initialValues}
@@ -24,23 +27,23 @@ const invitation = () => (
                 }))
             })}
             onSubmit={values => {
-                setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2))
-                })
+                axios.get('https://api.imgflip.com/get_memes')
+                    .then(res => {
+                        console.log(res)
+                        setImage(res.data.data.memes[0].url)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
             }}
         >
             {({ values, handleBlur, error, touched, isSubmitting, setFieldValue }) => (
                 <Form>
-                    {/* <RichEditorExample 
-                    onChange={setFieldValue}
-                    onBlur={handleBlur}
-                    editorState={values.editorState}
-                    /> */}
                     <FieldArray name="friends">
                         {({ push, remove }) => (
                     <React.Fragment>
                         {values.friends && values.friends.length > 0 && values.friends.map((friends, index) => 
-                    <div className="row">
+                    <div key={index} className="row">
                         <div className="col">
                             <Field name={`friends[${index}].name`} type="text" placeholder="Enter name"/>
                             <ErrorMessage name={`friends[${index}].name`}>
@@ -58,7 +61,7 @@ const invitation = () => (
                         </div>
                     </div>
                         )}
-                <button type="button" className="secondary" onClick={()=> push({name: '', email: ''})}>ADD FRIEND</button>
+                <button type="button" className="secondary" onClick={()=> push()}>ADD FRIEND</button>
                 </React.Fragment>
                 )}
                 </FieldArray>
@@ -66,7 +69,12 @@ const invitation = () => (
                 </Form>
             )}
         </Formik>
+        <div>
+            {image.length > 0 ? <img src={image} alt="meme" /> : null}
+        </div>
     </div>
-)
+    )
+    
+}
 
 export default invitation
